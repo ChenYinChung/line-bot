@@ -219,6 +219,7 @@ public class CallbackController {
    */
   @EventMapping
   public void handleJoinEvent(JoinEvent event) {
+    // TODO: call mps api add senderId for message push usual use.
     String replyToken = event.getReplyToken();
     this.replyText(replyToken, "Joined " + event.getSource());
   }
@@ -312,6 +313,14 @@ public class CallbackController {
     reply(replyToken, new StickerMessage(content.getPackageId(), content.getStickerId()));
   }
 
+  /**
+   * 主要文字操作反應區
+   *
+   * @param replyToken
+   * @param event
+   * @param content
+   * @throws Exception
+   */
   private void handleTextContent(String replyToken, Event event, TextMessageContent content)
       throws Exception {
     final String text = content.getText();
@@ -437,12 +446,43 @@ public class CallbackController {
                   history);
 
           QuickReply quickReply = QuickReply.items(items);
-          TextMessage templateMessage =
-              TextMessage.builder().text("快速查詢指令").quickReply(quickReply).build();
+          TextMessage templateMessage = TextMessage.builder().text("快速查詢指令").quickReply(quickReply).build();
 
           this.reply(replyToken, templateMessage);
           break;
         }
+      case "quick_reply":
+      {
+        final List<QuickReplyItem> items = Arrays.<QuickReplyItem>asList(
+                QuickReplyItem.builder()
+                        .action(new MessageAction("MessageAction", "MessageAction"))
+                        .build(),
+                QuickReplyItem.builder()
+                        .action(CameraAction.withLabel("CameraAction"))
+                        .build(),
+                QuickReplyItem.builder()
+                        .action(CameraRollAction.withLabel("CemeraRollAction"))
+                        .build(),
+                QuickReplyItem.builder()
+                        .action(LocationAction.withLabel("Location"))
+                        .build(),
+                QuickReplyItem.builder()
+                        .action(PostbackAction.builder()
+                                .label("PostbackAction")
+                                .text("PostbackAction clicked")
+                                .data("{PostbackAction: true}")
+                                .build())
+                        .build()
+        );
+
+        final QuickReply quickReply = QuickReply.items(items);
+
+        TextMessage templateMessage = TextMessage.builder().text("快速查詢指令").quickReply(quickReply).build();
+
+        this.reply(replyToken, templateMessage);
+
+        break;
+      }
       case "carousel":
         {
           URI imageUrl = createUri("/static/buttons/1040.jpg");
