@@ -315,177 +315,206 @@ public class CallbackController {
   private void handleTextContent(String replyToken, Event event, TextMessageContent content)
       throws Exception {
     final String text = content.getText();
-    // 符合投注的pattern
-    Optional<Betting.BetEnum> optionalBetEnum = Betting.parseSrc(text);
-    if (optionalBetEnum.isPresent()) {
-      Betting.BetEnum betEnum = optionalBetEnum.get();
 
-      String senderId = event.getSource().getSenderId();
-      String userId = event.getSource().getUserId();
-
-      if (userId != null) {
-
-        CompletableFuture<UserProfileResponse> userProfileFuture =
-            lineMessagingClient.getProfile(event.getSource().getUserId());
-
-        UserProfileResponse userProfile = null;
-        try {
-          userProfile = userProfileFuture.get();
-
-          // TODO: Call MPS API betting here
-          String current = "1234";
-          String userName = userProfile.getDisplayName();
-          String response =
-              String.format(
-                  "第%s局 %s | %s%s | 投注成功",
-                  current, userName, betEnum.getName(), betEnum.getAmount().intValue());
-          this.replyText(replyToken, response);
-
-        } catch (Exception e) {
-          log.info(e.getMessage());
-          this.replyText(replyToken, "** 下注格式有誤，請檢視下注格式 **");
-        }
-
-      } else {
-        this.replyText(replyToken, "** 下注格式有誤，請檢視下注格式 **");
-      }
-
+    // 非投注Pattern
+    log.info("Got text message from replyToken:{}: text:{}", replyToken, text);
+    String switchType = "";
+    if (Betting.isBettingString(text)) {
+      switchType = "Bet";
     } else {
-      // 非投注Pattern
-      log.info("Got text message from replyToken:{}: text:{}", replyToken, text);
-      switch (text) {
-        case "充值":
-          {
-            ConfirmTemplate confirmTemplate =
-                new ConfirmTemplate(
-                    "充值?", new MessageAction("Yes", "是"), new MessageAction("No", "否"));
-            TemplateMessage templateMessage = new TemplateMessage("確認", confirmTemplate);
-            this.reply(replyToken, templateMessage);
-            break;
+      switchType = text;
+    }
+
+    switch (switchType) {
+      case "Bet":
+        {
+          Optional<Betting.BetEnum> optionalBetEnum = Betting.parseSrc(text);
+          Betting.BetEnum betEnum = optionalBetEnum.get();
+
+          String senderId = event.getSource().getSenderId();
+          String userId = event.getSource().getUserId();
+
+          if (userId != null) {
+
+            CompletableFuture<UserProfileResponse> userProfileFuture =
+                lineMessagingClient.getProfile(event.getSource().getUserId());
+
+            UserProfileResponse userProfile = null;
+            try {
+              userProfile = userProfileFuture.get();
+
+              // TODO: Call MPS API betting here
+              String current = "1234";
+              String userName = userProfile.getDisplayName();
+              String response =
+                  String.format(
+                      "第%s局 %s | %s%s | 投注成功",
+                      current, userName, betEnum.getName(), betEnum.getAmount().intValue());
+              this.replyText(replyToken, response);
+
+            } catch (Exception e) {
+              log.info(e.getMessage());
+              this.replyText(replyToken, "** 下注格式有誤，請檢視下注格式 **");
+            }
+          } else {
+            this.replyText(replyToken, "** 無法取得用戶資訊 **");
           }
-        case "遊戲":
-          {
-            URI imageUrl = createUri("/static/buttons/logo.png");
-            ButtonsTemplate buttonsTemplate =
-                new ButtonsTemplate(
-                    imageUrl,
-                    "遊戲攻略",
-                    "相關",
-                    Arrays.asList(
-                        new URIAction("進入遊戲", URI.create("https://www.yabothai.com/"), null),
-                        new PostbackAction("餘額", "餘額", "餘額"),
-                        new MessageAction("客服", "客服"),
-                        new URIAction(
-                            "常見問題", URI.create("https://www.w686.net/info/commonProblem"), null)));
+          break;
+        }
+      case "充值":
+        {
+          ConfirmTemplate confirmTemplate =
+              new ConfirmTemplate(
+                  "充值?", new MessageAction("Yes", "是"), new MessageAction("No", "否"));
+          TemplateMessage templateMessage = new TemplateMessage("確認", confirmTemplate);
+          this.reply(replyToken, templateMessage);
+          break;
+        }
+      case "遊戲":
+        {
+          URI imageUrl = createUri("/static/buttons/logo.png");
+          ButtonsTemplate buttonsTemplate =
+              new ButtonsTemplate(
+                  imageUrl,
+                  "遊戲攻略",
+                  "相關",
+                  Arrays.asList(
+                      new URIAction("進入遊戲", URI.create("https://www.yabothai.com/"), null),
+                      new PostbackAction("餘額", "餘額", "餘額"),
+                      new MessageAction("客服", "客服"),
+                      new URIAction(
+                          "常見問題", URI.create("https://www.w686.net/info/commonProblem"), null)));
 
-            TemplateMessage templateMessage =
-                new TemplateMessage("Game alter text", buttonsTemplate);
-            this.reply(replyToken, templateMessage);
-            break;
-          }
-        case "快速查詢":{
-          QuickReplyItem betCLI =  QuickReplyItem.builder().action(new MessageAction("投注指令", "您好, 投注指令格式为玩法＋金额, 例如庄100\n" + "\n" + "如果投注成功, 系统会回传讯息；如果投注不成功, 请确认投注格式是否有误, 或余额是否不足, 如有任何问题均可联系客服询问")).build();
-          QuickReplyItem awardCLI =  QuickReplyItem.builder().action(new MessageAction("打赏指令", "您好, 打赏指令格式为打赏＋金额, 例如打赏10")).build();
-          QuickReplyItem login =  QuickReplyItem.builder().action(new MessageAction("平台登錄", "开启 https://www.yabothai.com/")).build();
-          QuickReplyItem discount =  QuickReplyItem.builder().action(new MessageAction("最新优惠", "机器人丢出优惠活动")).build();
-          QuickReplyItem register =  QuickReplyItem.builder().action(new MessageAction("如何注册", "您好, 请点击「选单-会员注册」, 或联系客服询问")).build();
-          QuickReplyItem deposite =  QuickReplyItem.builder().action(new MessageAction("如何充值", "您好, 请点击「选单-会员充值」, 或联系客服询问")).build();
-          QuickReplyItem withdraw =  QuickReplyItem.builder().action(new MessageAction("如何提现", "您好, 提现请至娱乐城申请(https://yabothai.com),或联系客服询问")).build();
-          QuickReplyItem balance =  QuickReplyItem.builder().action(new MessageAction("如何查询余额", "您好, 请点击「选单-馀额查询」, 或联系客服询问")).build();
-          QuickReplyItem history =  QuickReplyItem.builder().action(new MessageAction("如何查询战绩", "您好, 请点击「选单-战绩查询」, 或联系客服询问")).build();
+          TemplateMessage templateMessage = new TemplateMessage("Game alter text", buttonsTemplate);
+          this.reply(replyToken, templateMessage);
+          break;
+        }
+      case "快速查詢":
+        {
+          QuickReplyItem betCLI =
+              QuickReplyItem.builder()
+                  .action(
+                      new MessageAction(
+                          "投注指令",
+                          "您好, 投注指令格式为玩法＋金额, 例如庄100\n"
+                              + "\n"
+                              + "如果投注成功, 系统会回传讯息；如果投注不成功, 请确认投注格式是否有误, 或余额是否不足, 如有任何问题均可联系客服询问"))
+                  .build();
+          QuickReplyItem awardCLI =
+              QuickReplyItem.builder()
+                  .action(new MessageAction("打赏指令", "您好, 打赏指令格式为打赏＋金额, 例如打赏10"))
+                  .build();
+          QuickReplyItem login =
+              QuickReplyItem.builder()
+                  .action(new MessageAction("平台登錄", "开启 https://www.yabothai.com/"))
+                  .build();
+          QuickReplyItem discount =
+              QuickReplyItem.builder().action(new MessageAction("最新优惠", "机器人丢出优惠活动")).build();
+          QuickReplyItem register =
+              QuickReplyItem.builder()
+                  .action(new MessageAction("如何注册", "您好, 请点击「选单-会员注册」, 或联系客服询问"))
+                  .build();
+          QuickReplyItem deposite =
+              QuickReplyItem.builder()
+                  .action(new MessageAction("如何充值", "您好, 请点击「选单-会员充值」, 或联系客服询问"))
+                  .build();
+          QuickReplyItem withdraw =
+              QuickReplyItem.builder()
+                  .action(new MessageAction("如何提现", "您好, 提现请至娱乐城申请(https://yabothai.com),或联系客服询问"))
+                  .build();
+          QuickReplyItem balance =
+              QuickReplyItem.builder()
+                  .action(new MessageAction("如何查询余额", "您好, 请点击「选单-馀额查询」, 或联系客服询问"))
+                  .build();
+          QuickReplyItem history =
+              QuickReplyItem.builder()
+                  .action(new MessageAction("如何查询战绩", "您好, 请点击「选单-战绩查询」, 或联系客服询问"))
+                  .build();
 
-          List<QuickReplyItem> items = Arrays.<QuickReplyItem>asList(betCLI,awardCLI,login,discount,register,deposite,withdraw,balance,history);
-
+          List<QuickReplyItem> items =
+              Arrays.<QuickReplyItem>asList(
+                  betCLI, awardCLI, login, discount, register, deposite, withdraw, balance,
+                  history);
 
           QuickReply quickReply = QuickReply.items(items);
-          TextMessage templateMessage = TextMessage.builder().text("快速查詢指令").quickReply(quickReply).build();
+          TextMessage templateMessage =
+              TextMessage.builder().text("快速查詢指令").quickReply(quickReply).build();
 
           this.reply(replyToken, templateMessage);
           break;
         }
-        case "carousel": {
+      case "carousel":
+        {
           URI imageUrl = createUri("/static/buttons/1040.jpg");
-          CarouselTemplate carouselTemplate = new CarouselTemplate(
+          CarouselTemplate carouselTemplate =
+              new CarouselTemplate(
                   Arrays.asList(
-                          new CarouselColumn(imageUrl, "hoge", "fuga", Arrays.asList(
-                                  new URIAction("Go to line.me",
-                                          URI.create("https://line.me"), null),
-                                  new URIAction("Go to line.me",
-                                          URI.create("https://line.me"), null),
-                                  new PostbackAction("Say hello1",
-                                          "hello こんにちは")
-                          )),
-                          new CarouselColumn(imageUrl, "hoge", "fuga", Arrays.asList(
-                                  new PostbackAction("言 hello2",
-                                          "hello こんにちは",
-                                          "hello こんにちは"),
-                                  new PostbackAction("言 hello2",
-                                          "hello こんにちは",
-                                          "hello こんにちは"),
-                                  new MessageAction("Say message",
-                                          "Rice=米")
-                          )),
-                          new CarouselColumn(imageUrl, "Datetime Picker",
-                                  "Please select a date, time or datetime", Arrays.asList(
-                                  DatetimePickerAction.OfLocalDatetime
-                                          .builder()
-                                          .label("Datetime")
-                                          .data("action=sel")
-                                          .initial(LocalDateTime.parse("2017-06-18T06:15"))
-                                          .min(LocalDateTime.parse("1900-01-01T00:00"))
-                                          .max(LocalDateTime.parse("2100-12-31T23:59"))
-                                          .build(),
-                                  DatetimePickerAction.OfLocalDate
-                                          .builder()
-                                          .label("Date")
-                                          .data("action=sel&only=date")
-                                          .initial(LocalDate.parse("2017-06-18"))
-                                          .min(LocalDate.parse("1900-01-01"))
-                                          .max(LocalDate.parse("2100-12-31"))
-                                          .build(),
-                                  DatetimePickerAction.OfLocalTime
-                                          .builder()
-                                          .label("Time")
-                                          .data("action=sel&only=time")
-                                          .initial(LocalTime.parse("06:15"))
-                                          .min(LocalTime.parse("00:00"))
-                                          .max(LocalTime.parse("23:59"))
-                                          .build()
-                          ))
-                  ));
-          TemplateMessage templateMessage = new TemplateMessage("Carousel alt text", carouselTemplate);
+                      new CarouselColumn(
+                          imageUrl,
+                          "hoge",
+                          "fuga",
+                          Arrays.asList(
+                              new URIAction("Go to line.me", URI.create("https://line.me"), null),
+                              new URIAction("Go to line.me", URI.create("https://line.me"), null),
+                              new PostbackAction("Say hello1", "hello こんにちは"))),
+                      new CarouselColumn(
+                          imageUrl,
+                          "hoge",
+                          "fuga",
+                          Arrays.asList(
+                              new PostbackAction("言 hello2", "hello こんにちは", "hello こんにちは"),
+                              new PostbackAction("言 hello2", "hello こんにちは", "hello こんにちは"),
+                              new MessageAction("Say message", "Rice=米"))),
+                      new CarouselColumn(
+                          imageUrl,
+                          "Datetime Picker",
+                          "Please select a date, time or datetime",
+                          Arrays.asList(
+                              DatetimePickerAction.OfLocalDatetime.builder()
+                                  .label("Datetime")
+                                  .data("action=sel")
+                                  .initial(LocalDateTime.parse("2017-06-18T06:15"))
+                                  .min(LocalDateTime.parse("1900-01-01T00:00"))
+                                  .max(LocalDateTime.parse("2100-12-31T23:59"))
+                                  .build(),
+                              DatetimePickerAction.OfLocalDate.builder()
+                                  .label("Date")
+                                  .data("action=sel&only=date")
+                                  .initial(LocalDate.parse("2017-06-18"))
+                                  .min(LocalDate.parse("1900-01-01"))
+                                  .max(LocalDate.parse("2100-12-31"))
+                                  .build(),
+                              DatetimePickerAction.OfLocalTime.builder()
+                                  .label("Time")
+                                  .data("action=sel&only=time")
+                                  .initial(LocalTime.parse("06:15"))
+                                  .min(LocalTime.parse("00:00"))
+                                  .max(LocalTime.parse("23:59"))
+                                  .build()))));
+          TemplateMessage templateMessage =
+              new TemplateMessage("Carousel alt text", carouselTemplate);
           this.reply(replyToken, templateMessage);
           break;
         }
-        case "image_carousel": {
+      case "image_carousel":
+        {
           URI imageUrl = createUri("/static/buttons/1040.jpg");
-          ImageCarouselTemplate imageCarouselTemplate = new ImageCarouselTemplate(
+          ImageCarouselTemplate imageCarouselTemplate =
+              new ImageCarouselTemplate(
                   Arrays.asList(
-                          new ImageCarouselColumn(imageUrl,
-                                  new URIAction("Goto line.me",
-                                          URI.create("https://line.me"), null)
-                          ),
-                          new ImageCarouselColumn(imageUrl,
-                                  new MessageAction("Say message",
-                                          "Rice=米")
-                          ),
-                          new ImageCarouselColumn(imageUrl,
-                                  new PostbackAction("言 hello2",
-                                          "hello こんにちは",
-                                          "hello こんにちは")
-                          )
-                  ));
-          TemplateMessage templateMessage = new TemplateMessage("ImageCarousel alt text",
-                  imageCarouselTemplate);
+                      new ImageCarouselColumn(
+                          imageUrl,
+                          new URIAction("Goto line.me", URI.create("https://line.me"), null)),
+                      new ImageCarouselColumn(imageUrl, new MessageAction("Say message", "Rice=米")),
+                      new ImageCarouselColumn(
+                          imageUrl, new PostbackAction("言 hello2", "hello こんにちは", "hello こんにちは"))));
+          TemplateMessage templateMessage =
+              new TemplateMessage("ImageCarousel alt text", imageCarouselTemplate);
           this.reply(replyToken, templateMessage);
           break;
-        } default:
-          /**
-           * 注冊，投注會以1 on 1方式取得userId Line群裡，回覆的內容必需將 senderId 存下來 sender 可能是userId, roomId, groupId
-           */
-//          this.replyText(replyToken, "無對應指令");
-          break;
-      }
+        }
+      default:
+        break;
     }
   }
 

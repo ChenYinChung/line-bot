@@ -62,7 +62,7 @@ public class Betting {
   public static Optional<BetEnum> parseSrc(String src) {
     BetEnum[] bets = BetEnum.values();
     for (BetEnum betEnum : bets) {
-      if (src.contains(betEnum.getName())) {
+      if (src.startsWith(betEnum.getName())) {
         String betAmount = parseAmount(src);
         // 符合投注，有金額內容
         if (betAmount != null) {
@@ -73,6 +73,16 @@ public class Betting {
     }
 
     return Optional.empty();
+  }
+
+  public static boolean isBettingString(String src){
+    BetEnum[] bets = BetEnum.values();
+    for (BetEnum betEnum : bets) {
+      if (src.startsWith(betEnum.getName())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public static void main(String[] arg) {
