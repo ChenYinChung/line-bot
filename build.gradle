@@ -1,0 +1,227 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+buildscript {
+    ext {
+        kotlin_version = '1.3.71'
+        spring_boot_version = '2.2.5.RELEASE'
+    }
+
+    repositories {
+        mavenCentral()
+        maven { url 'https://plugins.gradle.org/m2/' }
+        maven { url 'https://repo.spring.io/plugins-release' }
+    }
+    dependencies {
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.27.0'
+        classpath 'com.puppycrawl.tools:checkstyle:8.30'
+        classpath 'gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:2.0.0'
+        classpath 'io.franzbecker:gradle-lombok:3.3.0'
+        classpath 'io.spring.gradle:dependency-management-plugin:1.0.9.RELEASE'
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:$spring_boot_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'idea'
+apply plugin: 'jacoco'
+apply plugin: 'com.github.ben-manes.versions'
+
+group = 'com.linecorp.bot'
+version = ''
+
+allprojects {
+    repositories {
+        mavenCentral();
+    }
+}
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'io.franzbecker.gradle-lombok'
+    apply plugin: 'io.spring.dependency-management'
+
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    group = rootProject.group
+    version = rootProject.version
+
+    ext['guava.version'] = '28.2-jre'
+    ext['retrofit.version'] = '2.6.1'
+
+    buildDir = "${rootDir}/build/${name}"
+
+    dependencyManagement {
+        imports {
+            mavenBom SpringBootPlugin.BOM_COORDINATES
+        }
+
+        dependencies {
+            dependency 'com.google.guava:guava:' + ext['guava.version']
+            dependency 'com.github.stefanbirkner:system-rules:1.19.0'
+            dependencySet(group: 'com.squareup.retrofit2', version: ext['retrofit.version']) {
+                entry 'converter-jackson'
+                entry 'retrofit'
+            }
+        }
+    }
+
+    dependencies {
+        annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+        testImplementation 'com.google.guava:guava'
+        testImplementation 'com.github.stefanbirkner:system-rules'
+        testImplementation 'com.squareup.okhttp3:mockwebserver'
+        testImplementation 'org.hibernate.validator:hibernate-validator'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test' // MockHttpServletRequest
+        testImplementation 'org.springframework.boot:spring-boot-starter-logging'
+    }
+
+    compileJava.dependsOn(processResources)
+
+    jar {
+        manifest {
+            attributes 'Implementation-Title': project.name,
+                    'Implementation-Version': archiveVersion
+        }
+    }
+
+    lombok {
+        version = '1.18.12'
+    }
+
+    compileJava {
+        options.compilerArgs << '-Xlint:all' << '-Xlint:deprecation' << '-Werror' << '-Xlint:-processing' << '-parameters'
+        options.encoding = 'UTF-8'
+    }
+
+    project.plugins.withType(SpringBootPlugin) {
+        bootRun {
+            systemProperties System.properties
+        }
+    }
+}
+
+project("line-bot-api-client") {
+
+    dependencies {
+        api project(':line-bot-model')
+        implementation 'org.slf4j:slf4j-api'
+        implementation 'com.squareup.okhttp3:logging-interceptor'
+        implementation 'com.squareup.retrofit2:converter-jackson'
+        implementation 'com.squareup.retrofit2:retrofit'
+
+        testCompileOnly 'org.projectlombok:lombok'
+        testAnnotationProcessor 'org.projectlombok:lombok'
+    }
+
+}
+
+project("line-bot-cli") {
+    apply plugin: 'org.springframework.boot'
+
+    dependencies {
+        implementation project(':line-bot-spring-boot')
+        implementation project(':line-bot-api-client')
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'com.google.guava:guava'
+        implementation 'org.yaml:snakeyaml'
+    }
+
+    jar {
+        enabled = true
+    }
+
+    bootJar {
+        enabled = true
+        // Custom Launch Script avoid https://github.com/spring-projects/spring-boot/issues/5164
+        launchScript {
+            script = file('src/main/resources/launch.script')
+        }
+        archiveClassifier.set('exec')
+        mainClassName = 'com.linecorp.bot.cli.Application'
+    }
+
+    bootJar.dependsOn.clear()
+    bootJar.dependsOn jar
+    artifacts.add(
+            'archives',
+            file("$buildDir/libs/${project.name}-${project.version}-${bootJar.archiveClassifier.get()}.jar")) {
+        classifier = bootJar.archiveClassifier.get()
+    }
+
+}
+
+project("line-bot-model") {
+    dependencies {
+        api 'com.fasterxml.jackson.core:jackson-databind' // Provide configured ObjectMapper.
+        implementation 'com.fasterxml.jackson.core:jackson-annotations'
+        implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+        implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names'
+    }
+}
+
+project("line-bot-parser") {
+    dependencies {
+        api project(':line-bot-model')
+        implementation 'com.fasterxml.jackson.core:jackson-databind'
+        implementation 'org.slf4j:slf4j-api'
+    }
+}
+
+project("line-bot-servlet") {
+    dependencies {
+        api project(':line-bot-api-client')
+        api project(':line-bot-model')
+        implementation project(':line-bot-parser')
+        implementation 'com.fasterxml.jackson.core:jackson-databind'
+        implementation 'com.google.guava:guava'
+
+        compileOnly 'javax.servlet:javax.servlet-api'
+        testImplementation 'javax.servlet:javax.servlet-api'
+        compileOnly 'org.slf4j:slf4j-api'
+    }
+}
+
+project("line-bot-spring-boot") {
+    dependencies {
+        api project(':line-bot-api-client')
+        api project(':line-bot-model')
+        implementation project(':line-bot-parser')
+        implementation 'org.springframework.boot:spring-boot-autoconfigure'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'com.google.guava:guava'
+
+        compileOnly 'javax.validation:validation-api'
+    }
+}
+
+
+def env = hasProperty('env') ? env : 'local'
+
+project("line-bot") {
+    apply plugin: 'org.springframework.boot'
+
+    configurations {
+        all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+    }
+
+
+    dependencies {
+        implementation project(':line-bot-spring-boot')
+        implementation "org.springframework.boot:spring-boot-starter-web"
+        implementation 'com.google.guava:guava'
+        implementation "org.springframework.boot:spring-boot-starter-undertow"
+        implementation "org.springframework.boot:spring-boot-starter-log4j2"
+    }
+
+    processResources {
+        if(env=="local")
+            return
+
+        assert project.file("conf/${env}/resources").exists()
+        inputs.dir project.file("conf/${env}/resources")
+        from "conf/${env}/resources"
+    }
+}

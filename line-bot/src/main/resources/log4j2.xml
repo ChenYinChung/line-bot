@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration monitorInterval="0" package="" status="WARN">
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <Filters>
+                <MarkerFilter marker="audit_marker" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <MarkerFilter marker="aop_marker" onMatch="DENY" onMismatch="ACCEPT"/>
+            </Filters>
+            <PatternLayout pattern="%d{ISO8601} %-5p [%c{3}] [%t] %m%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="console" level="INFO"/>
+        </Root>
+    </Loggers>
+</Configuration>
