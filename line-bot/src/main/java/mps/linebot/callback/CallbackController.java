@@ -483,7 +483,7 @@ public class CallbackController {
           /**
            * 注冊，投注會以1 on 1方式取得userId Line群裡，回覆的內容必需將 senderId 存下來 sender 可能是userId, roomId, groupId
            */
-          this.replyText(replyToken, "無對應指令");
+//          this.replyText(replyToken, "無對應指令");
           break;
       }
     }
