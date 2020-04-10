@@ -361,7 +361,7 @@ public class CallbackController {
             try {
 
               UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
-
+              userProfile.showProfile();
               // TODO: Call MPS API betting here
               String current = "1234";
               String userName = userProfile.getDisplayName();
@@ -382,6 +382,9 @@ public class CallbackController {
         }
       case "充值":
         {
+          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
+          userProfile.showProfile();
+
           ConfirmTemplate confirmTemplate =
               new ConfirmTemplate(
                   "充值?", new MessageAction("Yes", "是"), new MessageAction("No", "否"));
@@ -391,6 +394,9 @@ public class CallbackController {
         }
       case "遊戲":
         {
+          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
+          userProfile.showProfile();
+
           URI imageUrl = createUri("/static/buttons/logo.png");
           ButtonsTemplate buttonsTemplate =
               new ButtonsTemplate(
@@ -410,21 +416,29 @@ public class CallbackController {
         }
       case "快速查詢":
         {
+          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
+          userProfile.showProfile();
+
           this.reply(replyToken, new MessageWithQuickReplySupplier().get());
           break;
         }
       case "余额":
         {
+          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
+          userProfile.showProfile();
+
           String senderId = event.getSource().getSenderId();
           String userId = event.getSource().getUserId();
           //TODO : call api get user's balance
-          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
           this.reply(replyToken, new BalanceFlexMessageSupplier(userProfile.getDisplayName(),"123.456").get());
           break;
 
         }
       case "quick_reply":
       {
+        UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
+        userProfile.showProfile();
+
         final List<QuickReplyItem> items = Arrays.<QuickReplyItem>asList(
                 QuickReplyItem.builder()
                         .action(new MessageAction("MessageAction", "MessageAction"))
@@ -457,6 +471,9 @@ public class CallbackController {
       }
       case "carousel":
         {
+          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
+          userProfile.showProfile();
+
           URI imageUrl = createUri("/static/buttons/1040.jpg");
           CarouselTemplate carouselTemplate =
               new CarouselTemplate(
@@ -510,6 +527,9 @@ public class CallbackController {
         }
       case "image_carousel":
         {
+          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
+          userProfile.showProfile();
+
           URI imageUrl = createUri("/static/buttons/1040.jpg");
           ImageCarouselTemplate imageCarouselTemplate =
               new ImageCarouselTemplate(
