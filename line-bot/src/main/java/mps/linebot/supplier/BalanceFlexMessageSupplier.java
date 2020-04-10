@@ -32,88 +32,83 @@ import static java.util.Arrays.asList;
 
 public class BalanceFlexMessageSupplier implements Supplier<FlexMessage> {
 
-    String userId;
-    String balance;
-    public BalanceFlexMessageSupplier(String userId, String balance){
-        this.userId = userId;
-        this.balance = balance;
-    }
+  String userId;
+  String balance;
 
-    @Override
-    public FlexMessage get() {
+  public BalanceFlexMessageSupplier(String userId, String balance) {
+    this.userId = userId;
+    this.balance = balance;
+  }
 
-        final Box bodyBlock = createBodyBlock();
-        final Bubble bubble = Bubble.builder().body(bodyBlock).build();
+  @Override
+  public FlexMessage get() {
 
+    final Box bodyBlock = createBodyBlock();
+    final Bubble bubble = Bubble.builder().body(bodyBlock).build();
 
+    return new FlexMessage(userId+" Balance Query", bubble);
+  }
 
-        return new FlexMessage("ALT", bubble);
-    }
+  private Box createBodyBlock() {
+    final Text title =
+        Text.builder()
+            .text("Balance")
+            .weight(TextWeight.BOLD)
+            .size(FlexFontSize.XL)
+            .build();
 
+    final Box info = createInfoBox();
 
-    private Box createBodyBlock() {
-        final Text title =
-                Text.builder()
-                    .text("Balance")
-                    .weight(TextWeight.BOLD)
-                    .size(FlexFontSize.XL)
-                    .build();
+    return Box.builder().layout(FlexLayout.VERTICAL).contents(asList(title, info)).backgroundColor("#27ACB2").build();
+  }
 
-        final Box info = createInfoBox();
+  private Box createInfoBox() {
+    final Box place =
+        Box.builder()
+            .layout(FlexLayout.BASELINE)
+            .spacing(FlexMarginSize.SM)
+            .contents(
+                asList(
+                    Text.builder()
+                        .text("User")
+                        .color("#aaaaaa")
+                        .size(FlexFontSize.SM)
+                        .flex(1)
+                        .build(),
+                    Text.builder()
+                        .text(userId)
+                        .wrap(true)
+                        .color("#666666")
+                        .size(FlexFontSize.SM)
+                        .flex(5)
+                        .build()))
+            .build();
+    final Box time =
+        Box.builder()
+            .layout(FlexLayout.BASELINE)
+            .spacing(FlexMarginSize.SM)
+            .contents(
+                asList(
+                    Text.builder()
+                        .text("Amount")
+                        .color("#aaaaaa")
+                        .size(FlexFontSize.SM)
+                        .flex(1)
+                        .build(),
+                    Text.builder()
+                        .text(balance)
+                        .wrap(true)
+                        .color("#666666")
+                        .size(FlexFontSize.SM)
+                        .flex(5)
+                        .build()))
+            .build();
 
-        return Box.builder()
-                  .layout(FlexLayout.VERTICAL)
-                  .contents(asList(title, info))
-                  .build();
-    }
-
-    private Box createInfoBox() {
-        final Box place = Box
-                .builder()
-                .layout(FlexLayout.BASELINE)
-                .spacing(FlexMarginSize.SM)
-                .contents(asList(
-                        Text.builder()
-                            .text("Place")
-                            .color("#aaaaaa")
-                            .size(FlexFontSize.SM)
-                            .flex(1)
-                            .build(),
-                        Text.builder()
-                            .text("Shinjuku, Tokyo")
-                            .wrap(true)
-                            .color("#666666")
-                            .size(FlexFontSize.SM)
-                            .flex(5)
-                            .build()
-                ))
-                .build();
-        final Box time =
-                Box.builder()
-                   .layout(FlexLayout.BASELINE)
-                   .spacing(FlexMarginSize.SM)
-                   .contents(asList(
-                           Text.builder()
-                               .text("Time")
-                               .color("#aaaaaa")
-                               .size(FlexFontSize.SM)
-                               .flex(1)
-                               .build(),
-                           Text.builder()
-                               .text("10:00 - 23:00")
-                               .wrap(true)
-                               .color("#666666")
-                               .size(FlexFontSize.SM)
-                               .flex(5)
-                               .build()
-                   ))
-                   .build();
-
-        return Box.builder()
-                  .layout(FlexLayout.VERTICAL)
-                  .margin(FlexMarginSize.LG)
-                  .spacing(FlexMarginSize.SM)
-                  .contents(asList(place, time))
-                  .build();
-    }
+    return Box.builder()
+        .layout(FlexLayout.VERTICAL)
+        .margin(FlexMarginSize.LG)
+        .spacing(FlexMarginSize.SM)
+        .contents(asList(place, time))
+        .build();
+  }
 }
