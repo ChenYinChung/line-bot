@@ -360,7 +360,7 @@ public class CallbackController {
 
             try {
 
-              UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
+              UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient, event);
               userProfile.showProfile();
               // TODO: Call MPS API betting here
               String current = "1234";
@@ -382,7 +382,7 @@ public class CallbackController {
         }
       case "充值":
         {
-          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
+          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient, event);
           userProfile.showProfile();
 
           ConfirmTemplate confirmTemplate =
@@ -394,7 +394,7 @@ public class CallbackController {
         }
       case "遊戲":
         {
-          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
+          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient, event);
           userProfile.showProfile();
 
           URI imageUrl = createUri("/static/buttons/logo.png");
@@ -416,7 +416,7 @@ public class CallbackController {
         }
       case "快速查詢":
         {
-          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
+          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient, event);
           userProfile.showProfile();
 
           this.reply(replyToken, new MessageWithQuickReplySupplier().get());
@@ -424,54 +424,53 @@ public class CallbackController {
         }
       case "余额":
         {
-          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
+          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient, event);
           userProfile.showProfile();
 
           String senderId = event.getSource().getSenderId();
           String userId = event.getSource().getUserId();
-          //TODO : call api get user's balance
-          this.reply(replyToken, new BalanceFlexMessageSupplier(userProfile.getDisplayName(),"123.456").get());
+          // TODO : call api get user's balance
+          this.reply(
+              replyToken,
+              new BalanceFlexMessageSupplier(userProfile.getDisplayName(), "123.456").get());
           break;
-
         }
       case "quick_reply":
-      {
-        UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
-        userProfile.showProfile();
+        {
+          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient, event);
+          userProfile.showProfile();
 
-        final List<QuickReplyItem> items = Arrays.<QuickReplyItem>asList(
-                QuickReplyItem.builder()
-                        .action(new MessageAction("MessageAction", "MessageAction"))
-                        .build(),
-                QuickReplyItem.builder()
-                        .action(CameraAction.withLabel("CameraAction"))
-                        .build(),
-                QuickReplyItem.builder()
-                        .action(CameraRollAction.withLabel("CemeraRollAction"))
-                        .build(),
-                QuickReplyItem.builder()
-                        .action(LocationAction.withLabel("Location"))
-                        .build(),
-                QuickReplyItem.builder()
-                        .action(PostbackAction.builder()
-                                .label("PostbackAction")
-                                .text("PostbackAction clicked")
-                                .data("{PostbackAction: true}")
-                                .build())
-                        .build()
-        );
+          final List<QuickReplyItem> items =
+              Arrays.<QuickReplyItem>asList(
+                  QuickReplyItem.builder()
+                      .action(new MessageAction("MessageAction", "MessageAction"))
+                      .build(),
+                  QuickReplyItem.builder().action(CameraAction.withLabel("CameraAction")).build(),
+                  QuickReplyItem.builder()
+                      .action(CameraRollAction.withLabel("CemeraRollAction"))
+                      .build(),
+                  QuickReplyItem.builder().action(LocationAction.withLabel("Location")).build(),
+                  QuickReplyItem.builder()
+                      .action(
+                          PostbackAction.builder()
+                              .label("PostbackAction")
+                              .text("PostbackAction clicked")
+                              .data("{PostbackAction: true}")
+                              .build())
+                      .build());
 
-        final QuickReply quickReply = QuickReply.items(items);
+          final QuickReply quickReply = QuickReply.items(items);
 
-        TextMessage templateMessage = TextMessage.builder().text("快速查詢指令").quickReply(quickReply).build();
+          TextMessage templateMessage =
+              TextMessage.builder().text("快速查詢指令").quickReply(quickReply).build();
 
-        this.reply(replyToken, templateMessage);
+          this.reply(replyToken, templateMessage);
 
-        break;
-      }
+          break;
+        }
       case "carousel":
         {
-          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
+          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient, event);
           userProfile.showProfile();
 
           URI imageUrl = createUri("/static/buttons/1040.jpg");
@@ -527,7 +526,7 @@ public class CallbackController {
         }
       case "image_carousel":
         {
-          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
+          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient, event);
           userProfile.showProfile();
 
           URI imageUrl = createUri("/static/buttons/1040.jpg");

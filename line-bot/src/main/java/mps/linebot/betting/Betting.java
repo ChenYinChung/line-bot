@@ -58,8 +58,8 @@ public class Betting {
   }
 
   protected static String prefix(String src){
-    // 只讀純數字部份
-    Pattern pattern = Pattern.compile("[\\d]{1,}");
+    // 只讀純數字部份與+
+    Pattern pattern = Pattern.compile("[\\d\\+ ]{1,}");
 
     Matcher matcher = pattern.matcher(src);
     String match ="";
@@ -108,7 +108,7 @@ public class Betting {
   }
 
   public static void main(String[] arg) {
-    String test = "庄对abc100.3元";
+    String test = "庄对+ 101.3元";
 
     Optional<BetEnum> optionalBetEnum = Betting.parseSrc(test);
     if (optionalBetEnum.isPresent()) {
