@@ -42,7 +42,7 @@ public class HelloController {
   public void pushMessage(@RequestParam(defaultValue = "U15bfc8c8105dfa155b9f5ae32e4a31a0") String userId,@RequestParam(defaultValue = "單一發送") String content ) {
     try {
 
-      if(content.equals("單一發送") || userId.equals("U15bfc8c8105dfa155b9f5ae32e4a31a0")){
+      if(content.equals("單一發送") && userId.equals("U15bfc8c8105dfa155b9f5ae32e4a31a0")){
         content = "您是不是忘了填userId & content , 試一下https://sammyline.herokuapp.com/push?userId=aaa&content=你想說什麼";
       }
 
@@ -61,7 +61,7 @@ public class HelloController {
   public void multicastMessage(@RequestParam(defaultValue = "U15bfc8c8105dfa155b9f5ae32e4a31a0") String userIds,@RequestParam(defaultValue = "可以多人傳送喔") String content) {
     try {
 
-      if(content.equals("可以多人傳送喔") || userIds.equals("U15bfc8c8105dfa155b9f5ae32e4a31a0")){
+      if(content.equals("可以多人傳送喔") && userIds.equals("U15bfc8c8105dfa155b9f5ae32e4a31a0")){
         content = "您是不是忘了填userIds & content , 試一下https://sammyline.herokuapp.com/multicast?userIds=aaa,bbb,ccc&content=你想說什麼";
       }
 
@@ -107,7 +107,7 @@ public class HelloController {
   public void messageNotify(@RequestParam(defaultValue = "Ra1ba6323c881c0cba849a69ae42784fd") String roomId,@RequestParam(defaultValue = "群發給Bot同群的人") String content ) {
     try {
 
-      if(content.equals("群發給Bot同群的人") || roomId.equals("Ra1ba6323c881c0cba849a69ae42784fd")){
+      if(content.equals("群發給Bot同群的人") && roomId.equals("Ra1ba6323c881c0cba849a69ae42784fd")){
         content = "您是不是忘了填roomId & content , 試一下https://sammyline.herokuapp.com/message?roomId=aaa&content=你想對大家說什麼";
       }
 
