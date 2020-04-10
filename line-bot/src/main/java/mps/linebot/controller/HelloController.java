@@ -39,9 +39,14 @@ public class HelloController {
    * 2. channelToken
    * 3. message */
   @GetMapping("/push")
-  public void pushMessage(@RequestParam(defaultValue = "U15bfc8c8105dfa155b9f5ae32e4a31a0") String userId) {
+  public void pushMessage(@RequestParam(defaultValue = "U15bfc8c8105dfa155b9f5ae32e4a31a0") String userId,@RequestParam(defaultValue = "單一發送") String content ) {
     try {
-      PushMessage pushMessage = new PushMessage(userId, new TextMessage("HelloController push 回覆"));
+
+      if(content.equals("單一發送") || userId.equals("U15bfc8c8105dfa155b9f5ae32e4a31a0")){
+        content = "您是不是忘了填userId & content , 試一下https://sammyline.herokuapp.com/push?userId=aaa&content=你想說什麼";
+      }
+
+      PushMessage pushMessage = new PushMessage(userId, new TextMessage(content));
       BotApiResponse response = lineMessagingClient.pushMessage(pushMessage).get();
       log.info("Sent messages: {}", response);
     } catch (InterruptedException | ExecutionException e) {
@@ -53,8 +58,12 @@ public class HelloController {
    * 針對指定的人員傳送
    */
   @GetMapping("/multicast")
-  public void multicastMessage(@RequestParam(defaultValue = "U15bfc8c8105dfa155b9f5ae32e4a31a0") String userIds) {
+  public void multicastMessage(@RequestParam(defaultValue = "U15bfc8c8105dfa155b9f5ae32e4a31a0") String userIds,@RequestParam(defaultValue = "可以多人傳送喔") String content) {
     try {
+
+      if(content.equals("可以多人傳送喔") || userIds.equals("U15bfc8c8105dfa155b9f5ae32e4a31a0")){
+        content = "您是不是忘了填userIds & content , 試一下https://sammyline.herokuapp.com/multicast?userIds=aaa,bbb,ccc&content=你想說什麼";
+      }
 
       Set<String> ids = new HashSet<>();
       String[] uids = userIds.split(",");
@@ -62,7 +71,7 @@ public class HelloController {
       for (String id : uids) {
         ids.add(id);
       }
-      Multicast multicast = new Multicast(ids, new TextMessage("HelloController multicast for assign users 回覆"));
+      Multicast multicast = new Multicast(ids, new TextMessage(content));
 
       BotApiResponse response = lineMessagingClient.multicast(multicast).get();
       log.info("Sent messages: {}", response);
@@ -75,8 +84,13 @@ public class HelloController {
    * 針對所有人
    */
   @GetMapping("/broadcast")
-  public void broadcastMessage() {
+  public void broadcastMessage(@RequestParam(defaultValue = "針對所有人都會收到") String content) {
     try {
+      if(content.equals("針對所有人都會收到")){
+        content = "您是不是忘了填 content , 試一下https://sammyline.herokuapp.com/broadcast?content=大家都會收到訊息耶";
+      }
+
+
       TextMessage textMessage = new TextMessage("HelloController broadcastMessage for all users 回覆");
       Broadcast broadcast = new Broadcast(textMessage);
 
@@ -90,11 +104,15 @@ public class HelloController {
    * 針對room ID 發送
    */
   @GetMapping("/message")
-  public void messageNotify(@RequestParam(defaultValue = "Ra1ba6323c881c0cba849a69ae42784fd") String roomId ) {
+  public void messageNotify(@RequestParam(defaultValue = "Ra1ba6323c881c0cba849a69ae42784fd") String roomId,@RequestParam(defaultValue = "群發給Bot同群的人") String content ) {
     try {
 
+      if(content.equals("群發給Bot同群的人") || roomId.equals("Ra1ba6323c881c0cba849a69ae42784fd")){
+        content = "您是不是忘了填roomId & content , 試一下https://sammyline.herokuapp.com/message?roomId=aaa&content=你想對大家說什麼";
+      }
+
       PushMessage pushMessage =
-          new PushMessage(roomId, new TextMessage("HelloController message reply for room id 回覆"));
+          new PushMessage(roomId, new TextMessage(content));
       BotApiResponse response = lineMessagingClient.pushMessage(pushMessage).get();
       log.info("Sent messages: {}", response);
 
