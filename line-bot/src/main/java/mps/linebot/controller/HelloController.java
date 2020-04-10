@@ -49,7 +49,7 @@ public class HelloController {
   }
 
   /**
-   * send message for assign users
+   * 針對指定的人員傳送
    */
   @GetMapping("/multicast")
   public void multicastMessage() {
@@ -67,15 +67,11 @@ public class HelloController {
   }
 
   /**
-   * send message for each other
+   * 針對所有人
    */
   @GetMapping("/broadcast")
   public void broadcastMessage() {
     try {
-//
-//      Set<String> userIds = new HashSet<>();
-//      userIds.add(userId);
-//      Multicast multicast = new Multicast(userIds, new TextMessage("HelloController broadcastMessage 回覆"));
       TextMessage textMessage = new TextMessage("HelloController broadcastMessage for all users 回覆");
       Broadcast broadcast = new Broadcast(textMessage);
 
@@ -86,7 +82,7 @@ public class HelloController {
     }
   }
   /**
-   * send notify message to chatroom
+   * 針對room ID 發送
    */
   @GetMapping("/message")
   public void messageNotify() {

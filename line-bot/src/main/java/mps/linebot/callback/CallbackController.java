@@ -16,7 +16,33 @@
 
 package mps.linebot.callback;
 
-import static java.util.Collections.singletonList;
+import com.google.common.io.ByteStreams;
+import com.linecorp.bot.client.LineBlobClient;
+import com.linecorp.bot.client.LineMessagingClient;
+import com.linecorp.bot.client.MessageContentResponse;
+import com.linecorp.bot.model.ReplyMessage;
+import com.linecorp.bot.model.action.*;
+import com.linecorp.bot.model.event.*;
+import com.linecorp.bot.model.event.message.*;
+import com.linecorp.bot.model.event.source.Source;
+import com.linecorp.bot.model.message.*;
+import com.linecorp.bot.model.message.flex.container.Bubble;
+import com.linecorp.bot.model.message.quickreply.QuickReply;
+import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
+import com.linecorp.bot.model.message.template.*;
+import com.linecorp.bot.model.profile.UserProfileResponse;
+import com.linecorp.bot.model.response.BotApiResponse;
+import com.linecorp.bot.spring.boot.annotation.EventMapping;
+import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
+import lombok.NonNull;
+import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
+import mps.linebot.WebApplication;
+import mps.linebot.betting.Betting;
+import mps.linebot.supplier.BalanceFlexMessageSupplier;
+import mps.linebot.supplier.MessageWithQuickReplySupplier;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,61 +62,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import com.linecorp.bot.model.action.*;
-import com.linecorp.bot.model.message.quickreply.QuickReply;
-import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
-import com.linecorp.bot.model.message.template.*;
-import com.linecorp.bot.model.profile.UserProfileResponse;
-import mps.linebot.WebApplication;
-import mps.linebot.betting.Betting;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import com.google.common.io.ByteStreams;
-
-import com.linecorp.bot.client.LineBlobClient;
-import com.linecorp.bot.client.LineMessagingClient;
-import com.linecorp.bot.client.MessageContentResponse;
-import com.linecorp.bot.model.ReplyMessage;
-import com.linecorp.bot.model.event.BeaconEvent;
-import com.linecorp.bot.model.event.Event;
-import com.linecorp.bot.model.event.FollowEvent;
-import com.linecorp.bot.model.event.JoinEvent;
-import com.linecorp.bot.model.event.MemberJoinedEvent;
-import com.linecorp.bot.model.event.MemberLeftEvent;
-import com.linecorp.bot.model.event.MessageEvent;
-import com.linecorp.bot.model.event.PostbackEvent;
-import com.linecorp.bot.model.event.UnfollowEvent;
-import com.linecorp.bot.model.event.message.AudioMessageContent;
-import com.linecorp.bot.model.event.message.ContentProvider;
-import com.linecorp.bot.model.event.message.FileMessageContent;
-import com.linecorp.bot.model.event.message.ImageMessageContent;
-import com.linecorp.bot.model.event.message.LocationMessageContent;
-import com.linecorp.bot.model.event.message.StickerMessageContent;
-import com.linecorp.bot.model.event.message.TextMessageContent;
-import com.linecorp.bot.model.event.message.VideoMessageContent;
-import com.linecorp.bot.model.event.source.Source;
-import com.linecorp.bot.model.message.AudioMessage;
-import com.linecorp.bot.model.message.ImageMessage;
-import com.linecorp.bot.model.message.LocationMessage;
-import com.linecorp.bot.model.message.Message;
-import com.linecorp.bot.model.message.StickerMessage;
-import com.linecorp.bot.model.message.TemplateMessage;
-import com.linecorp.bot.model.message.TextMessage;
-import com.linecorp.bot.model.message.VideoMessage;
-import com.linecorp.bot.model.response.BotApiResponse;
-import com.linecorp.bot.spring.boot.annotation.EventMapping;
-import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
-
-import lombok.NonNull;
-import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
+import static java.util.Collections.singletonList;
 
 @Slf4j
 @LineMessageHandler
 /**
  * 接收來自Line Server 的訊息
- *
+ * https://developers.line.biz/zh-hant/docs/messaging-api/building-bot/#webhook-event-types
  * <p>使用postman 測試，模擬Linse Server回應 , 只能使用post 1.Url : localhost:8080/callback 2.Headers
  * Content-Type : application/json Authorization : Bear+一個空白+Secret-Key -> Bear
  * Er1NFDxx8xZVh1BOEd2fo7v8HH1XWYCjGL9LUAP7nW+f8UfiAabD1Yu59Pr3mGTQioDuICCCP7rRHtObnz9iS4tBuoYXS1Nz/h+hSbayx9p3dyJaG338L52xOqyf0XMFoLwnmTEoCpxdsLgpDZ3GoQdB04t89/1O/w1cDnyilFU=
@@ -105,6 +83,11 @@ public class CallbackController {
 
   @Autowired private LineBlobClient lineBlobClient;
 
+  /**
+   * 接收文字
+   * @param event
+   * @throws Exception
+   */
   @EventMapping
   public void handleTextMessageEvent(MessageEvent<TextMessageContent> event) throws Exception {
     TextMessageContent message = event.getMessage();
@@ -112,11 +95,19 @@ public class CallbackController {
     handleTextContent(event.getReplyToken(), event, message);
   }
 
+  /**
+   * 表情圖案
+   * @param event
+   */
   @EventMapping
   public void handleStickerMessageEvent(MessageEvent<StickerMessageContent> event) {
     handleSticker(event.getReplyToken(), event.getMessage());
   }
 
+  /**
+   * 地理位置
+   * @param event
+   */
   @EventMapping
   public void handleLocationMessageEvent(MessageEvent<LocationMessageContent> event) {
     LocationMessageContent locationMessage = event.getMessage();
@@ -129,6 +120,11 @@ public class CallbackController {
             locationMessage.getLongitude()));
   }
 
+  /**
+   * 接收圖檔
+   * @param event
+   * @throws IOException
+   */
   @EventMapping
   public void handleImageMessageEvent(MessageEvent<ImageMessageContent> event) throws IOException {
     // You need to install ImageMagick
@@ -151,6 +147,11 @@ public class CallbackController {
         });
   }
 
+  /**
+   * 音樂格式
+   * @param event
+   * @throws IOException
+   */
   @EventMapping
   public void handleAudioMessageEvent(MessageEvent<AudioMessageContent> event) throws IOException {
     handleHeavyContent(
@@ -168,6 +169,11 @@ public class CallbackController {
         });
   }
 
+  /**
+   * 影像格式
+   * @param event
+   * @throws IOException
+   */
   @EventMapping
   public void handleVideoMessageEvent(MessageEvent<VideoMessageContent> event) throws IOException {
     // You need to install ffmpeg and ImageMagick.
@@ -190,6 +196,10 @@ public class CallbackController {
         });
   }
 
+  /**
+   * 檔案
+   * @param event
+   */
   @EventMapping
   public void handleFileMessageEvent(MessageEvent<FileMessageContent> event) {
     this.reply(
@@ -199,6 +209,7 @@ public class CallbackController {
                 "Received '%s'(%d bytes)",
                 event.getMessage().getFileName(), event.getMessage().getFileSize())));
   }
+
 
   @EventMapping
   public void handleUnfollowEvent(UnfollowEvent event) {
@@ -325,7 +336,6 @@ public class CallbackController {
       throws Exception {
     final String text = content.getText();
 
-    // 非投注Pattern
     log.info("Got text message from replyToken:{}: text:{}", replyToken, text);
     String switchType = "";
     if (Betting.isBettingString(text)) {
@@ -400,56 +410,17 @@ public class CallbackController {
         }
       case "快速查詢":
         {
-          QuickReplyItem betCLI =
-              QuickReplyItem.builder()
-                  .action(
-                      new MessageAction(
-                          "投注指令",
-                          "您好, 投注指令格式为玩法＋金额, 例如庄100\n"
-                              + "\n"
-                              + "如果投注成功, 系统会回传讯息；如果投注不成功, 请确认投注格式是否有误, 或余额是否不足, 如有任何问题均可联系客服询问"))
-                  .build();
-          QuickReplyItem awardCLI =
-              QuickReplyItem.builder()
-                  .action(new MessageAction("打赏指令", "您好, 打赏指令格式为打赏＋金额, 例如打赏10"))
-                  .build();
-          QuickReplyItem login =
-              QuickReplyItem.builder()
-                  .action(new MessageAction("平台登錄", "开启 https://www.yabothai.com/"))
-                  .build();
-          QuickReplyItem discount =
-              QuickReplyItem.builder().action(new MessageAction("最新优惠", "机器人丢出优惠活动")).build();
-          QuickReplyItem register =
-              QuickReplyItem.builder()
-                  .action(new MessageAction("如何注册", "您好, 请点击「选单-会员注册」, 或联系客服询问"))
-                  .build();
-          QuickReplyItem deposite =
-              QuickReplyItem.builder()
-                  .action(new MessageAction("如何充值", "您好, 请点击「选单-会员充值」, 或联系客服询问"))
-                  .build();
-          QuickReplyItem withdraw =
-              QuickReplyItem.builder()
-                  .action(new MessageAction("如何提现", "您好, 提现请至娱乐城申请(https://yabothai.com),或联系客服询问"))
-                  .build();
-          QuickReplyItem balance =
-              QuickReplyItem.builder()
-                  .action(new MessageAction("如何查询余额", "您好, 请点击「选单-馀额查询」, 或联系客服询问"))
-                  .build();
-          QuickReplyItem history =
-              QuickReplyItem.builder()
-                  .action(new MessageAction("如何查询战绩", "您好, 请点击「选单-战绩查询」, 或联系客服询问"))
-                  .build();
-
-          List<QuickReplyItem> items =
-              Arrays.<QuickReplyItem>asList(
-                  betCLI, awardCLI, login, discount, register, deposite, withdraw, balance,
-                  history);
-
-          QuickReply quickReply = QuickReply.items(items);
-          TextMessage templateMessage = TextMessage.builder().text("快速查詢指令").quickReply(quickReply).build();
-
-          this.reply(replyToken, templateMessage);
+          this.reply(replyToken, new MessageWithQuickReplySupplier().get());
           break;
+        }
+      case "balance":
+        {
+          String senderId = event.getSource().getSenderId();
+          String userId = event.getSource().getUserId();
+          //TODO : call api get user's balance
+          this.reply(replyToken, new BalanceFlexMessageSupplier(userId,"123.456").get());
+          break;
+
         }
       case "quick_reply":
       {
