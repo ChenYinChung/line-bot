@@ -75,6 +75,6 @@ public class MessageWithQuickReplySupplier implements Supplier<Message> {
             betCLI, awardCLI, login, discount, register, deposite, withdraw, balance, history);
 
     QuickReply quickReply = QuickReply.items(items);
-    return TextMessage.builder().quickReply(quickReply).build();
+    return TextMessage.builder().text("快速查詢").quickReply(quickReply).build();
   }
 }
