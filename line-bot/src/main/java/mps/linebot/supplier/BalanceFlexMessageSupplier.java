@@ -52,7 +52,7 @@ public class BalanceFlexMessageSupplier implements Supplier<FlexMessage> {
   private Box createBodyBlock() {
     final Text title =
         Text.builder()
-            .text("Balance")
+            .text("余額")
             .weight(TextWeight.BOLD)
             .size(FlexFontSize.XL)
             .build();
@@ -71,14 +71,14 @@ public class BalanceFlexMessageSupplier implements Supplier<FlexMessage> {
                 asList(
                     Text.builder()
                         .text("User")
-                        .color("#27ACF2")
+                        .color("#F9F900")
                         .size(FlexFontSize.SM)
                         .flex(1)
                         .build(),
                     Text.builder()
                         .text(userId)
                         .wrap(true)
-                        .color("#55ACF2")
+                        .color("#28FF28")
                         .size(FlexFontSize.SM)
                         .flex(5)
                         .build()))
@@ -91,14 +91,14 @@ public class BalanceFlexMessageSupplier implements Supplier<FlexMessage> {
                 asList(
                     Text.builder()
                         .text("Amount")
-                        .color("#27ACF2")
+                        .color("#F9F900")
                         .size(FlexFontSize.SM)
                         .flex(1)
                         .build(),
                     Text.builder()
                         .text(balance)
                         .wrap(true)
-                        .color("#55ACF2")
+                        .color("#28FF28")
                         .size(FlexFontSize.SM)
                         .flex(5)
                         .build()))

@@ -53,12 +53,16 @@ public class HelloController {
    * 針對指定的人員傳送
    */
   @GetMapping("/multicast")
-  public void multicastMessage(@RequestParam(defaultValue = "U15bfc8c8105dfa155b9f5ae32e4a31a0") String userId) {
+  public void multicastMessage(@RequestParam(defaultValue = "U15bfc8c8105dfa155b9f5ae32e4a31a0") String userIds) {
     try {
 
-      Set<String> userIds = new HashSet<>();
-      userIds.add(userId);
-      Multicast multicast = new Multicast(userIds, new TextMessage("HelloController multicast for assign users 回覆"));
+      Set<String> ids = new HashSet<>();
+      String[] uids = userIds.split(",");
+
+      for (String id : uids) {
+        ids.add(id);
+      }
+      Multicast multicast = new Multicast(ids, new TextMessage("HelloController multicast for assign users 回覆"));
 
       BotApiResponse response = lineMessagingClient.multicast(multicast).get();
       log.info("Sent messages: {}", response);
