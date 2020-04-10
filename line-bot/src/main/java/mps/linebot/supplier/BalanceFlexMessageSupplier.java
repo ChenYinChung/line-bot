@@ -70,7 +70,7 @@ public class BalanceFlexMessageSupplier implements Supplier<FlexMessage> {
             .contents(
                 asList(
                     Text.builder()
-                        .text("User")
+                        .text("姓名")
                         .color("#F9F900")
                         .size(FlexFontSize.SM)
                         .flex(1)
@@ -90,7 +90,7 @@ public class BalanceFlexMessageSupplier implements Supplier<FlexMessage> {
             .contents(
                 asList(
                     Text.builder()
-                        .text("Amount")
+                        .text("金額")
                         .color("#F9F900")
                         .size(FlexFontSize.SM)
                         .flex(1)
