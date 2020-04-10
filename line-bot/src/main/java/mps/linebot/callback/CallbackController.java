@@ -41,6 +41,7 @@ import mps.linebot.WebApplication;
 import mps.linebot.betting.Betting;
 import mps.linebot.supplier.BalanceFlexMessageSupplier;
 import mps.linebot.supplier.MessageWithQuickReplySupplier;
+import mps.linebot.supplier.UserProfileSupplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -339,13 +340,13 @@ public class CallbackController {
     log.info("Got text message from replyToken:{}: text:{}", replyToken, text);
     String switchType = "";
     if (Betting.isBettingString(text)) {
-      switchType = "Bet";
+      switchType = "下注";
     } else {
       switchType = text;
     }
 
     switch (switchType) {
-      case "Bet":
+      case "下注":
         {
           Optional<Betting.BetEnum> optionalBetEnum = Betting.parseSrc(text);
           Betting.BetEnum betEnum = optionalBetEnum.get();
@@ -358,9 +359,9 @@ public class CallbackController {
             CompletableFuture<UserProfileResponse> userProfileFuture =
                 lineMessagingClient.getProfile(event.getSource().getUserId());
 
-            UserProfileResponse userProfile = null;
             try {
-              userProfile = userProfileFuture.get();
+
+              UserProfileSupplier userProfile = new UserProfileSupplier(event);
 
               // TODO: Call MPS API betting here
               String current = "1234";
@@ -413,12 +414,13 @@ public class CallbackController {
           this.reply(replyToken, new MessageWithQuickReplySupplier().get());
           break;
         }
-      case "balance":
+      case "余额":
         {
           String senderId = event.getSource().getSenderId();
           String userId = event.getSource().getUserId();
           //TODO : call api get user's balance
-          this.reply(replyToken, new BalanceFlexMessageSupplier(userId,"123.456").get());
+          UserProfileSupplier userProfile = new UserProfileSupplier(event);
+          this.reply(replyToken, new BalanceFlexMessageSupplier(userProfile.getDisplayName(),"123.456").get());
           break;
 
         }

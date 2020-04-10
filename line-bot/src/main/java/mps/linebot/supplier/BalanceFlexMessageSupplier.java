@@ -71,14 +71,14 @@ public class BalanceFlexMessageSupplier implements Supplier<FlexMessage> {
                 asList(
                     Text.builder()
                         .text("User")
-                        .color("#aaaaaa")
+                        .color("#27ACF2")
                         .size(FlexFontSize.SM)
                         .flex(1)
                         .build(),
                     Text.builder()
                         .text(userId)
                         .wrap(true)
-                        .color("#666666")
+                        .color("#55ACF2")
                         .size(FlexFontSize.SM)
                         .flex(5)
                         .build()))
@@ -91,14 +91,14 @@ public class BalanceFlexMessageSupplier implements Supplier<FlexMessage> {
                 asList(
                     Text.builder()
                         .text("Amount")
-                        .color("#aaaaaa")
+                        .color("#27ACF2")
                         .size(FlexFontSize.SM)
                         .flex(1)
                         .build(),
                     Text.builder()
                         .text(balance)
                         .wrap(true)
-                        .color("#666666")
+                        .color("#55ACF2")
                         .size(FlexFontSize.SM)
                         .flex(5)
                         .build()))

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashSet;
@@ -24,8 +25,8 @@ public class HelloController {
   @Value("${line.bot.channel-token}")
   String channelToken;
 
-  String userId = "U15bfc8c8105dfa155b9f5ae32e4a31a0";
-  String roomId = "Ra1ba6323c881c0cba849a69ae42784fd";
+//  String userId = "U15bfc8c8105dfa155b9f5ae32e4a31a0";
+//  String roomId = "Ra1ba6323c881c0cba849a69ae42784fd";
 
   @GetMapping("/hello")
   public String helloGradle() {
@@ -37,8 +38,8 @@ public class HelloController {
    * 1. to : 主動通知需要UserId(GroupId群發)
    * 2. channelToken
    * 3. message */
-  @GetMapping("/push")
-  public void pushMessage() {
+  @GetMapping("/push/")
+  public void pushMessage(@RequestParam(defaultValue = "U15bfc8c8105dfa155b9f5ae32e4a31a0") String userId) {
     try {
       PushMessage pushMessage = new PushMessage(userId, new TextMessage("HelloController push 回覆"));
       BotApiResponse response = lineMessagingClient.pushMessage(pushMessage).get();
@@ -52,7 +53,7 @@ public class HelloController {
    * 針對指定的人員傳送
    */
   @GetMapping("/multicast")
-  public void multicastMessage() {
+  public void multicastMessage(@RequestParam(defaultValue = "U15bfc8c8105dfa155b9f5ae32e4a31a0") String userId) {
     try {
 
       Set<String> userIds = new HashSet<>();
@@ -85,7 +86,7 @@ public class HelloController {
    * 針對room ID 發送
    */
   @GetMapping("/message")
-  public void messageNotify() {
+  public void messageNotify(@RequestParam(defaultValue = "Ra1ba6323c881c0cba849a69ae42784fd") String roomId ) {
     try {
 
       PushMessage pushMessage =
