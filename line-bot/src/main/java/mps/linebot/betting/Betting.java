@@ -20,9 +20,9 @@ public class Betting {
     大("大"),
     小("小"),
     任意对子("任意对子"),
-    完美对子("任意对子"),
+    完美对子("完美对子"),
     超級六("超級六"),
-    超級6("超級六");
+    超級6("超級6");
 
     String name;
     BigDecimal amount;
@@ -57,10 +57,31 @@ public class Betting {
     return null;
   }
 
+  protected static String prefix(String src){
+    // 只讀純數字部份
+    Pattern pattern = Pattern.compile("[\\d]{1,}");
+
+    Matcher matcher = pattern.matcher(src);
+    String match ="";
+    // 純數字
+    if (matcher.find()) {
+      match =  matcher.group(0);
+    }
+
+    String prefix = src.substring(0,src.indexOf(match));
+    log.info("prefix[{}]",prefix);
+
+    return prefix;
+
+  }
+
+
   public static Optional<BetEnum> parseSrc(String src) {
     BetEnum[] bets = BetEnum.values();
+    String prefix = prefix(src);
+
     for (BetEnum betEnum : bets) {
-      if (src.startsWith(betEnum.getName())) {
+      if (prefix.equals(betEnum.getName())) {
         String betAmount = parseAmount(src);
         // 符合投注，有金額內容
         if (betAmount != null) {
@@ -74,9 +95,12 @@ public class Betting {
   }
 
   public static boolean isBettingString(String src){
+    String prefix = prefix(src);
+
     BetEnum[] bets = BetEnum.values();
+
     for (BetEnum betEnum : bets) {
-      if (src.startsWith(betEnum.getName())) {
+      if (prefix.equals(betEnum.getName())) {
         return true;
       }
     }
@@ -84,7 +108,7 @@ public class Betting {
   }
 
   public static void main(String[] arg) {
-    String test = "庄abc100.3元";
+    String test = "庄对abc100.3元";
 
     Optional<BetEnum> optionalBetEnum = Betting.parseSrc(test);
     if (optionalBetEnum.isPresent()) {
@@ -100,7 +124,5 @@ public class Betting {
       log.info(response);
 
     }
-
-
   }
 }

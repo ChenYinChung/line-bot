@@ -38,7 +38,7 @@ public class HelloController {
    * 1. to : 主動通知需要UserId(GroupId群發)
    * 2. channelToken
    * 3. message */
-  @GetMapping("/push/")
+  @GetMapping("/push")
   public void pushMessage(@RequestParam(defaultValue = "U15bfc8c8105dfa155b9f5ae32e4a31a0") String userId) {
     try {
       PushMessage pushMessage = new PushMessage(userId, new TextMessage("HelloController push 回覆"));
