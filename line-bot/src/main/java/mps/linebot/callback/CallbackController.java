@@ -26,7 +26,6 @@ import com.linecorp.bot.model.event.*;
 import com.linecorp.bot.model.event.message.*;
 import com.linecorp.bot.model.event.source.Source;
 import com.linecorp.bot.model.message.*;
-import com.linecorp.bot.model.message.flex.container.Bubble;
 import com.linecorp.bot.model.message.quickreply.QuickReply;
 import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import com.linecorp.bot.model.message.template.*;
@@ -361,7 +360,7 @@ public class CallbackController {
 
             try {
 
-              UserProfileSupplier userProfile = new UserProfileSupplier(event);
+              UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
 
               // TODO: Call MPS API betting here
               String current = "1234";
@@ -419,7 +418,7 @@ public class CallbackController {
           String senderId = event.getSource().getSenderId();
           String userId = event.getSource().getUserId();
           //TODO : call api get user's balance
-          UserProfileSupplier userProfile = new UserProfileSupplier(event);
+          UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient,event);
           this.reply(replyToken, new BalanceFlexMessageSupplier(userProfile.getDisplayName(),"123.456").get());
           break;
 
