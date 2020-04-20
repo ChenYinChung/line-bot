@@ -132,6 +132,55 @@ public class HelloController {
     try {
       RichMenuListResponse richMenuList = lineMessagingClient.getRichMenuList().get();
       return richMenuList.toString();
+    } catch (InterruptedException | ExecutionException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * 綁定User Id 與 richMenuId
+   * userId 1 : U15bfc8c8105dfa155b9f5ae32e4a31a0 richmenuId 1 :
+   * richmenu-cb7c75664fde9d9bcb4ced51d55aea6a richmenuId 2 :
+   * richmenu-d975035a7babf882405a6dd3b190f843
+   *
+   * @param userId
+   * @param richMenuId
+   * @return
+   */
+  @GetMapping("/link")
+  public String link(
+      @RequestParam(defaultValue = "U15bfc8c8105dfa155b9f5ae32e4a31a0") String userId,
+      @RequestParam(defaultValue = "richmenu-cb7c75664fde9d9bcb4ced51d55aea6a") String richMenuId) {
+
+    try {
+
+      if (userId.equals("U15bfc8c8105dfa155b9f5ae32e4a31a0")
+          && richMenuId.equals("richmenu-cb7c75664fde9d9bcb4ced51d55aea6a")) {}
+
+      BotApiResponse botApiResponse =
+          lineMessagingClient.linkRichMenuIdToUser(userId, richMenuId).get();
+      return botApiResponse.getMessage();
+
+    } catch (InterruptedException | ExecutionException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * 解除UserId的綁定
+   * @param userId
+   * @return
+   */
+  @GetMapping("/unlink")
+  public String unlink(
+      @RequestParam(defaultValue = "U15bfc8c8105dfa155b9f5ae32e4a31a0") String userId) {
+
+    try {
+
+      if (userId.equals("U15bfc8c8105dfa155b9f5ae32e4a31a0")) {}
+
+      BotApiResponse botApiResponse = lineMessagingClient.unlinkRichMenuIdFromUser(userId).get();
+      return botApiResponse.getMessage();
 
     } catch (InterruptedException | ExecutionException e) {
       throw new RuntimeException(e);
