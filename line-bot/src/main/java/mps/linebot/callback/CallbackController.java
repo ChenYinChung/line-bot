@@ -382,7 +382,7 @@ public class CallbackController {
         }
       case "注冊":{
         this.replyText(replyToken, "https://www.yabothai.com/signup");
-
+        break;
       }
       case "充值":
         {
@@ -472,10 +472,6 @@ public class CallbackController {
 
           break;
         }
-      case "sticker":
-      {
-
-      }
       case "carousel":
         {
           UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient, event);
