@@ -1,0 +1,323 @@
+{
+	"info": {
+		"_postman_id": "9988058b-b486-40c3-b7fd-a6fe79aefe80",
+		"name": "line",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "line server-> callback-以Json方送推",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer Er1NFDxx8xZVh1BOEd2fo7v8HH1XWYCjGL9LUAP7nW+f8UfiAabD1Yu59Pr3mGTQioDuICCCP7rRHtObnz9iS4tBuoYXS1Nz/h+hSbayx9p3dyJaG338L52xOqyf0XMFoLwnmTEoCpxdsLgpDZ3GoQdB04t89/1O/w1cDnyilFU=",
+						"type": "text"
+					},
+					{
+						"key": "X-Line-Signature",
+						"value": "xpBBD8Pg2UkCxcI6k3Nh5JaO19qSGM4WEQgY+0Ht/Sg=",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"events\": [\n        {\n            \"type\": \"message\",\n            \"replyToken\": \"18dd8eaf30c8404da1de06002cde05b9\",\n            \"source\": {\n                \"userId\": \"U470a93ec2caaa5ab9a42f528884ff27b\",\n                \"type\": \"user\"\n            },\n            \"timestamp\": 1497875299568,\n            \"message\": {\n                \"type\": \"text\",\n                \"id\": \"6263732340746\",\n                \"text\": \"遊戲\"\n            }\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "https://sammyline.herokuapp.com/callback",
+					"protocol": "https",
+					"host": [
+						"sammyline",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"callback"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "line server-> 綁定richmenu & userid",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer Er1NFDxx8xZVh1BOEd2fo7v8HH1XWYCjGL9LUAP7nW+f8UfiAabD1Yu59Pr3mGTQioDuICCCP7rRHtObnz9iS4tBuoYXS1Nz/h+hSbayx9p3dyJaG338L52xOqyf0XMFoLwnmTEoCpxdsLgpDZ3GoQdB04t89/1O/w1cDnyilFU=",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.line.me/v2/bot/user/U15bfc8c8105dfa155b9f5ae32e4a31a0/richmenu/richmenu-cb7c75664fde9d9bcb4ced51d55aea6a",
+					"protocol": "https",
+					"host": [
+						"api",
+						"line",
+						"me"
+					],
+					"path": [
+						"v2",
+						"bot",
+						"user",
+						"U15bfc8c8105dfa155b9f5ae32e4a31a0",
+						"richmenu",
+						"richmenu-cb7c75664fde9d9bcb4ced51d55aea6a"
+					]
+				},
+				"description": "綁定richmenu & userid"
+			},
+			"response": []
+		},
+		{
+			"name": "line server -> create richmenu",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer Er1NFDxx8xZVh1BOEd2fo7v8HH1XWYCjGL9LUAP7nW+f8UfiAabD1Yu59Pr3mGTQioDuICCCP7rRHtObnz9iS4tBuoYXS1Nz/h+hSbayx9p3dyJaG338L52xOqyf0XMFoLwnmTEoCpxdsLgpDZ3GoQdB04t89/1O/w1cDnyilFU=",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"size\":{\n        \"width\":2500,\n        \"height\":1686\n    },\n    \"selected\":false,\n    \"name\":\"中文訊息\",\n    \"chatBarText\":\"測試開合\",\n    \"areas\":[\n        {\n          \"bounds\":{\n              \"x\":551,\n              \"y\":325,\n              \"width\":321,\n              \"height\":321\n          },\n          \"action\":{\n              \"type\":\"message\",\n              \"text\":\"上\"\n          }\n        },\n        {\n          \"bounds\":{\n              \"x\":876,\n              \"y\":651,\n              \"width\":321,\n              \"height\":321\n          },\n          \"action\":{\n              \"type\":\"message\",\n              \"text\":\"右\"\n          }\n        },\n        {\n          \"bounds\":{\n              \"x\":551,\n              \"y\":972,\n              \"width\":321,\n              \"height\":321\n          },\n          \"action\":{\n              \"type\":\"message\",\n              \"text\":\"下\"\n          }\n        },\n        {\n          \"bounds\":{\n              \"x\":225,\n              \"y\":651,\n              \"width\":321,\n              \"height\":321\n          },\n          \"action\":{\n              \"type\":\"message\",\n              \"text\":\"左\"\n          }\n        },\n        {\n          \"bounds\":{\n              \"x\":1433,\n              \"y\":657,\n              \"width\":367,\n              \"height\":367\n          },\n          \"action\":{\n              \"type\":\"message\",\n              \"text\":\"按鈕B\"\n          }\n        },\n        {\n          \"bounds\":{\n              \"x\":1907,\n              \"y\":657,\n              \"width\":367,\n              \"height\":367\n          },\n          \"action\":{\n              \"type\":\"message\",\n              \"text\":\"按鈕A\"\n          }\n        }\n    ]\n  }"
+				},
+				"url": {
+					"raw": "https://api.line.me/v2/bot/richmenu",
+					"protocol": "https",
+					"host": [
+						"api",
+						"line",
+						"me"
+					],
+					"path": [
+						"v2",
+						"bot",
+						"richmenu"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "line server ->upload richmenu image",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer Er1NFDxx8xZVh1BOEd2fo7v8HH1XWYCjGL9LUAP7nW+f8UfiAabD1Yu59Pr3mGTQioDuICCCP7rRHtObnz9iS4tBuoYXS1Nz/h+hSbayx9p3dyJaG338L52xOqyf0XMFoLwnmTEoCpxdsLgpDZ3GoQdB04t89/1O/w1cDnyilFU=",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "image/png",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": "/Users/sammy/image.png"
+					}
+				},
+				"url": {
+					"raw": "https://api-data.line.me/v2/bot/richmenu/richmenu-cb7c75664fde9d9bcb4ced51d55aea6a/content",
+					"protocol": "https",
+					"host": [
+						"api-data",
+						"line",
+						"me"
+					],
+					"path": [
+						"v2",
+						"bot",
+						"richmenu",
+						"richmenu-cb7c75664fde9d9bcb4ced51d55aea6a",
+						"content"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "line server ->綁定richmenu & userid -2",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer Er1NFDxx8xZVh1BOEd2fo7v8HH1XWYCjGL9LUAP7nW+f8UfiAabD1Yu59Pr3mGTQioDuICCCP7rRHtObnz9iS4tBuoYXS1Nz/h+hSbayx9p3dyJaG338L52xOqyf0XMFoLwnmTEoCpxdsLgpDZ3GoQdB04t89/1O/w1cDnyilFU="
+					}
+				],
+				"url": {
+					"raw": "https://api.line.me/v2/bot/user/U15bfc8c8105dfa155b9f5ae32e4a31a0/richmenu/richmenu-d975035a7babf882405a6dd3b190f843",
+					"protocol": "https",
+					"host": [
+						"api",
+						"line",
+						"me"
+					],
+					"path": [
+						"v2",
+						"bot",
+						"user",
+						"U15bfc8c8105dfa155b9f5ae32e4a31a0",
+						"richmenu",
+						"richmenu-d975035a7babf882405a6dd3b190f843"
+					]
+				},
+				"description": "綁定richmenu & userid"
+			},
+			"response": []
+		},
+		{
+			"name": "line server -> setting richmenu list",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer Er1NFDxx8xZVh1BOEd2fo7v8HH1XWYCjGL9LUAP7nW+f8UfiAabD1Yu59Pr3mGTQioDuICCCP7rRHtObnz9iS4tBuoYXS1Nz/h+hSbayx9p3dyJaG338L52xOqyf0XMFoLwnmTEoCpxdsLgpDZ3GoQdB04t89/1O/w1cDnyilFU=",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.line.me/v2/bot/richmenu/list",
+					"protocol": "https",
+					"host": [
+						"api",
+						"line",
+						"me"
+					],
+					"path": [
+						"v2",
+						"bot",
+						"richmenu",
+						"list"
+					]
+				},
+				"description": "綁定richmenu & userid"
+			},
+			"response": []
+		},
+		{
+			"name": "line bot --> push-單獨推送給特定UserId / RoomId",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sammyline.herokuapp.com/push",
+					"protocol": "https",
+					"host": [
+						"sammyline",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"push"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "line bot -> message-通知訊息給roomId",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sammyline.herokuapp.com/message",
+					"protocol": "https",
+					"host": [
+						"sammyline",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"message"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "line bot -> multicast－所有被指定的人",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sammyline.herokuapp.com/multicast",
+					"protocol": "https",
+					"host": [
+						"sammyline",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"multicast"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "line bot -> list richmenu",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sammyline.herokuapp.com/list/richmenu",
+					"protocol": "https",
+					"host": [
+						"sammyline",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"list",
+						"richmenu"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "line bot -> broadcast－所有人",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://sammyline.herokuapp.com/broadcast",
+					"protocol": "https",
+					"host": [
+						"sammyline",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"broadcast"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
