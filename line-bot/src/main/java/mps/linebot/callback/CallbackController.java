@@ -426,6 +426,7 @@ public class CallbackController {
           this.reply(replyToken, new MessageWithQuickReplySupplier().get());
           break;
         }
+      case "余额查询":
       case "余额":
         {
           UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient, event);
@@ -438,7 +439,7 @@ public class CallbackController {
               replyToken,
               new BalanceFlexMessageSupplier(userProfile.getDisplayName(), "123.456").get());
           break;
-        }
+          }
       case "quick_reply":
         {
           UserProfileSupplier userProfile = new UserProfileSupplier(lineMessagingClient, event);
