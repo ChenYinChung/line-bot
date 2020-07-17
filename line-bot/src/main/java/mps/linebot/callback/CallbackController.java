@@ -335,8 +335,8 @@ public class CallbackController {
   private void handleTextContent(String replyToken, Event event, TextMessageContent content)
       throws Exception {
     final String text = content.getText();
-
-    log.info("Got text message from replyToken:{}: text:{}", replyToken, text);
+    String user = event.getSource().getUserId();
+    log.info("Got text message from userId:{} replyToken:{}: text:{}",user, replyToken, text);
     String switchType = "";
     if (Betting.isBettingString(text)) {
       switchType = "下注";
