@@ -345,6 +345,11 @@ public class CallbackController {
     }
 
     switch (switchType) {
+      case "liff":
+      {
+        this.replyText(replyToken, "line://app/1654461388-Z7R62D0z");
+        break;
+      }
       case "下注":
         {
           Optional<Betting.BetEnum> optionalBetEnum = Betting.parseSrc(text);
